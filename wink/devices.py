@@ -357,3 +357,83 @@ class piggy_bank(DeviceBase, Sharable):
 
 class sensor_pod(DeviceBase, Sharable):
     pass
+class light_bulb(DeviceBase, Sharable):
+
+    non_config_fields = [
+        "light_bulb_id",
+        "locale",
+        "device_manufacturer",
+        "upc_id",
+        "light_bulb_id",
+        "capabilities",
+        "location",
+        "units",
+        "linked_service_id",
+        "last_reading",
+        "radio_type",
+        "lat_lng",
+        "manufacturer_device_id",
+        "manufacturer_device_model",
+        "hidden_at",
+        "gang_id",
+        "triggers",
+        "hub_id",
+        "created_at",
+        "order",
+        "local_id"
+        "model_name",
+    ]
+
+    mutable_fields = [
+        ("name", str),
+        ("desired_state", dict)
+    ]
+
+    #subdevice_types = []
+
+    def _set_state(self, powered=None, brightness=None, toggle=False):
+        """Set the state of the bulb.
+
+        If *powered* is set, then the specified powered state will be set,
+        regardless of whether *toggle* is set to True.
+
+        If *powered* or *brightness* are not specified, there values will
+        remain the same as they currently are.
+
+        """
+        original = self.get_config()
+        new_brightness = orig_brightness = original['desired_state']['brightness']
+        new_powered = orig_powered = original['desired_state']['powered']
+
+
+
+        if powered is not None:
+            new_powered = powered
+        elif toggle:
+            new_powered = not orig_powered
+
+        if brightness is not None:
+            new_brightness = brightness
+
+        new_state = {
+                        u'brightness': new_brightness,
+                        u'powered' : new_powered
+                    }
+
+        self.update(dict(desired_state=new_state))
+
+    def turn_on(self):
+        self._set_state(powered=True)
+
+    def turn_off(self):
+        self._set_state(powered=False)
+
+    def toggle_power(self):
+        self._set_state(toggle=True)
+
+    def set_brightness(self, brightness):
+        self._set_state(brightness=brightness)
+
+    # todo: increment-brightness, get-brightness, get-powered
+    #       (maybe refactor the above some)
+
