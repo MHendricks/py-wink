@@ -4,6 +4,7 @@ from pprint import pprint
 
 from auth import reauth, need_to_reauth
 import devices
+import groups
 
 
 class Wink(object):
@@ -224,3 +225,13 @@ class Wink(object):
 
     def devices_by_type(self, typ):
         return list(self._devices_by_type.get(typ, []))
+
+    def get_group_by_id(self, group_id):
+        group = self._get('/groups/%s' % group_id)
+        return groups.Group(self, group)
+
+    def group_list(self):
+        ret = []
+        for group in self._get('/users/me/groups'):
+            ret.append(groups.Group(self, group))
+        return ret
